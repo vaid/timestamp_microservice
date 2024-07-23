@@ -23,19 +23,50 @@ app.get("/api/hello", function (req, res) {
   res.json({ greeting: "hello API" });
 });
 
-app.get("/api/2015-12-25", function (req, res) {
-  res.json({
-    unix: new Date("2015-12-25").getTime(),
-    utc: new Date("2015-12-25").toUTCString(),
-  });
+app.get("/api/:date", function (req, res) {
+  console.log("Input Format", req.params.date);
+  const inputDateParam = req.params.date;
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  const timestampPattern = /^\d{13}$/;
+  let dateObj = "";
+  if (datePattern.test(inputDateParam)) {
+    console.log("Date Format");
+    dateObj = new Date(req.params.date);
+  } else if (timestampPattern.test(inputDateParam)) {
+    console.log("Timestamp Format");
+    dateObj = new Date(parseInt(req.params.date));
+  } else if (inputDateParam == "") {
+    console.log("Empty Date");
+    dateObj = new Date();
+  } else {
+    dateObj = "";
+  }
+
+  if (dateObj === "") {
+    res.json({
+      error: "Invalid Date",
+    });
+  } else {
+    res.json({
+      unix: dateObj.getTime(),
+      utc: dateObj.toUTCString(),
+    });
+  }
 });
 
-app.get("/api/1451001600000", function (req, res) {
-  res.json({
-    unix: 1451001600000,
-    utc: new Date(1451001600000).toUTCString(),
-  });
-});
+// app.get("/api/2015-12-25", function (req, res) {
+//   res.json({
+//     unix: new Date("2015-12-25").getTime(),
+//     utc: new Date("2015-12-25").toUTCString(),
+//   });
+// });
+
+// app.get("/api/1451001600000", function (req, res) {
+//   res.json({
+//     unix: 1451001600000,
+//     utc: new Date(1451001600000).toUTCString(),
+//   });
+// });
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
