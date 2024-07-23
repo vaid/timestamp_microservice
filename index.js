@@ -23,23 +23,20 @@ app.get("/api/hello", function (req, res) {
   res.json({ greeting: "hello API" });
 });
 
-app.get("/api/:date", function (req, res) {
+// :date? --> ? means date can be optional param
+app.get("/api/:date?", function (req, res) {
   console.log("Input Format", req.params.date);
   const inputDateParam = req.params.date;
-  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
   const timestampPattern = /^\d{13}$/;
   let dateObj = "";
-  if (datePattern.test(inputDateParam)) {
-    console.log("Date Format");
-    dateObj = new Date(req.params.date);
-  } else if (timestampPattern.test(inputDateParam)) {
+  if (timestampPattern.test(inputDateParam)) {
     console.log("Timestamp Format");
     dateObj = new Date(parseInt(req.params.date));
-  } else if (inputDateParam == "") {
+  } else if (!req.params.date || !req.params.date.trim() === "") {
     console.log("Empty Date");
     dateObj = new Date();
-  } else {
-    dateObj = "";
+  } else if (!isNaN(new Date(inputDateParam).getTime())) {
+    dateObj = new Date(req.params.date);
   }
 
   if (dateObj === "") {
